@@ -36,7 +36,7 @@ nosetests.xml
 .pydevproject
 
 # SQLite databases
-*.sqlite
+*.sqlite3
 
 # Virtual environment
 django2_venv
