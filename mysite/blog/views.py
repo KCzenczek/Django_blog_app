@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from taggit.models import Tag
+from django.db.models import Count
 
 
 # def post_list(request):
@@ -86,6 +87,15 @@ def post_details(request, year, month, day, post):
     else:
     # if request.method == 'GET':
         comment_form = CommentForm()
+
+    # Lista podobnych postów
+    post_tags_ids = post.tags.values_list('id', flat=True)
+        #  pobieramy listę idików tagów, które są też chakterystyczne dla bieżącego posta
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+        #  pobieramy wyżej wszystkie posty zawierające dowolny z otrzymanych wczeniej tag, poza bieżącym
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')) \
+                        .order_by('-same_tags', '-publish')[:4]
+
     return render(
         request,
         'blog/post/detail.html',
@@ -94,6 +104,7 @@ def post_details(request, year, month, day, post):
             'comments': comments,
             'comment_form': comment_form,
             'new_comment_add': new_comment_add,
+            'similar_posts': similar_posts,
         }
     )
 
