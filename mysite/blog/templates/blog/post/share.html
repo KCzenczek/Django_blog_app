@@ -1,0 +1,19 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Udostępnij post{% endblock %}
+
+{% block content %}
+  {% if sent %}
+    <h1>E-mail wysłany, well done</h1>
+    <p>
+      wysłanie info o tym fantastycznym "{{ post.title }}" na email {{ form.cleaned_data.to }} się udało się.
+    </p>
+  {% else %}
+    <h1>Udostępnij "{{ post.title }}" komuś majlem </h1>
+    <form action="." method="post">
+      {{ form.as_p }}
+      {% csrf_token %}
+      <input type="submit" value="wyślij tegoż maila">
+    </form>
+  {% endif %}
+{% endblock %}

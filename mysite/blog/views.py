@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Post
+from .models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
+from .forms import EmailPostForm, CommentForm
+from django.core.mail import send_mail
 
 
 # def post_list(request):
@@ -57,10 +59,68 @@ def post_details(request, year, month, day, post):
         publish__month=month,
         publish__day=day,
     )
+    # lista aktywnych komentarzy dla posta wyciągniętego wyżej
+    comments = post.comments.filter(active=True)
+    new_comment_add = False
+
+    if request.method == 'POST':
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            #  tworzymy nowy komentarz na podstawie wysłanych danych
+            #  ale jeszcze go nie zapisujemy do bazy
+            new_comment = comment_form.save(commit=False)
+            #  przypisujemy go do posta
+            new_comment.post = post
+            #  zapisuejmy w bazie
+            new_comment.save()
+            new_comment_add = True
+    else:
+    # if request.method == 'GET':
+        comment_form = CommentForm()
     return render(
         request,
         'blog/post/detail.html',
         {
             'post': post,
+            'comments': comments,
+            'comment_form': comment_form,
+            'new_comment_add': new_comment_add,
+        }
+    )
+
+
+def post_share(request, post_id):
+    #  pobieranie posta na podst. jego identyfikatora
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        status='published',
+    )
+    sent = False
+
+    if request.method == 'POST':
+        form = EmailPostForm(request.POST)  # tworzymy formularz na podst. wysłanych danych z request.POST
+        if form.is_valid():
+            cd = form.cleaned_data
+            post_url = request.build_absolute_uri(
+                post.get_absolute_url()
+            )
+            subject = 'według {0} (a to ichni mail{1}) mówi, że "{2}" jest ok'.format(
+                cd['name'], cd['email'], post.title
+            )
+            message = 'Jak coś "{0}" jest tu {1}\n\n{2}\ skomentował tak: {3}'.format(
+                post.title, post_url, cd['name'], cd['comments']
+            )
+            send_mail(subject, message, 'od kogo', [cd['to']])
+            sent = True
+    else:
+        form = EmailPostForm()
+    return render(
+        request,
+        'blog/post/share.html',
+        {
+            'post': post,
+            'form': form,
+            'sent': sent,
         }
     )
