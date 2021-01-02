@@ -1,2 +1,4 @@
 #!/bin/bash
+
+# bo port domyślny 8000 mam wiecznie czymś zajęty
 exec ./manage.py runserver 0.0.0.0:8080
