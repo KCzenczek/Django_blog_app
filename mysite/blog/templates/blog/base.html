@@ -1,3 +1,4 @@
+{% load blog_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -12,7 +13,20 @@
   </div>
   <div id="sidebar">
     <h2>Najmojszy blog</h2>
-      <p>Najmojsiejszy blog ever.</p>
+      <p>Najmojsiejszy blog ever ma {% total_posts %} postów</p>
+
+      <h3>Najświeższe posty</h3>
+      {% show_latest_posts 3%}
+
+      <h3>Najczęściej komentowane posty</h3>
+      {% get_most_commented_posts as simple_varaible_not_tag_anymore %}
+      <ul>
+      {% for post in simple_varaible_not_tag_anymore %}
+          <li>
+              <a href="{{ post.get_absolute_url }}" >{{ post.title }} </a>
+          </li>
+      {% endfor %}
+      </ul>
   </div>
 </body>
 </html>
