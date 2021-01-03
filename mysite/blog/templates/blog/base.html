@@ -15,6 +15,8 @@
     <h2>Najmojszy blog</h2>
       <p>Najmojsiejszy blog ever ma {% total_posts %} postów</p>
 
+      <p><a href="{% url "blog:post_feed" %}">Subskrybuj kanał RSS</a></p>
+
       <h3>Najświeższe posty</h3>
       {% show_latest_posts 3%}
 
@@ -27,6 +29,7 @@
           </li>
       {% endfor %}
       </ul>
+
   </div>
 </body>
 </html>
