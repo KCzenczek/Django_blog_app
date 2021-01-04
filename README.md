@@ -1,0 +1,1 @@
+pierwsze repo typu blog_app z serii krótkich Djangowych przykładów 
