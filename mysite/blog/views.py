@@ -97,6 +97,13 @@ def post_details(request, year, month, day, post):
     similar_posts = similar_posts.annotate(same_tags=Count('tags')) \
                         .order_by('-same_tags', '-publish')[:4]
 
+    if len(comments) == 1:
+        comments_pl_ending = ''
+    elif len(comments) in (2, 3, 4):
+        comments_pl_ending = 'e'
+    else:
+        comments_pl_ending = 'y'
+
     return render(
         request,
         'blog/post/detail.html',
@@ -106,6 +113,7 @@ def post_details(request, year, month, day, post):
             'comment_form': comment_form,
             'new_comment_add': new_comment_add,
             'similar_posts': similar_posts,
+            'comments_pl_ending': comments_pl_ending,
         }
     )
 

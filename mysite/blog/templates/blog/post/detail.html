@@ -26,7 +26,7 @@
 
   {% with comments.count as total_comments %}
     <h2>
-      {{ total_comments }} komentrz{{ total_comments|pluralize:'y' }}
+      {{ total_comments }} komenatrz{{ comments_pl_ending }}
     </h2>
   {% endwith %}
   {% for comment in comments %}
